@@ -1,13 +1,14 @@
 const bodyParser = require('body-parser');
 const express = require('express');
+const routes = require('./routes/router');
 const app = express();
-const routes = require('./routes/EcommerceRoutes');
 
 app.set('view engine', 'ejs');
-app.use(bodyParser.urlencoded({extended:true}));
-app.use(express.static('public'));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/', routes);
+app.use(express.static('public'));
 
-app.listen(3003, () => {
-    console.log('server initilized on http://localhost:3003');
+app.listen(3000, () => {
+    console.log('server running on http://localhost:3000');
 });
+
