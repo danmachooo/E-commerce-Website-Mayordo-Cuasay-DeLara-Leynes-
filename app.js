@@ -1,5 +1,6 @@
 const bodyParser = require('body-parser');
 const express = require('express');
+const session = require('express-session');
 const routes = require('./routes/router');
 const cors = require('cors');
 const db = require('./config/db'); 
@@ -8,6 +9,11 @@ const app = express();
 
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(session({
+    secret: 'hello_world_my_secret_key',
+    resave: false,
+    saveUninitialized: true
+}));
 app.use(cors());
 app.use(express.static('public'));
 app.use('/', routes);
