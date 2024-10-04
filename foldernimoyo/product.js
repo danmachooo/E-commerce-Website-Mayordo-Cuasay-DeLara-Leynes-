@@ -12,6 +12,13 @@ const Product = {
         const [rows] = await pool.query('SELECT * FROM products WHERE id = ?', [productId]);
         return rows[0]; // Return the product object if found
     },
+update: async (id, updates) => {
+        const { name, description, price, image, stockQuantity, categoryId } = updates;
+        await pool.query(
+            'UPDATE products SET name = ?, description = ?, price = ?, image = ?, stock_quantity = ?, category_id = ? WHERE id = ?', 
+            [name, description, price, image, stockQuantity, categoryId, id]
+        );
+    },
 
     findAll: async () => {
         const [rows] = await pool.query('SELECT * FROM products');
