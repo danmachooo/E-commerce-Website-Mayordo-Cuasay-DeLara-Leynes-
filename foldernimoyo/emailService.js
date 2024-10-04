@@ -15,7 +15,7 @@ const sendVerificationEmail = (email, verificationToken) => {
     const verificationLink = `http://localhost:3000/auth/verify/${verificationToken}`;
 
     const mailOptions = {
-        from: '"Your E-commerce" <your_email@example.com>', // Sender address
+        from: '"Furni" johnpauldanmachi@gmail.com', // Sender address
         to: email, // List of recipients
         subject: 'Email Verification', // Subject line
         text: `Please verify your email by clicking the link: ${verificationLink}`, // Plain text body
