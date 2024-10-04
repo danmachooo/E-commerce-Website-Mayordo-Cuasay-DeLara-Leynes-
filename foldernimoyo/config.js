@@ -53,6 +53,7 @@ const init_db = async () => {
                 description TEXT,
                 price DECIMAL(10, 2) NOT NULL,
                 image VARCHAR(255),
+                stock_quantity INT,
                 category_id INT,
                 FOREIGN KEY (category_id) REFERENCES categories(id)
             );
