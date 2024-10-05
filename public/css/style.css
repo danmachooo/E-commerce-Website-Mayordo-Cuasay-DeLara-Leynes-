@@ -40,6 +40,9 @@ a {
     font-weight: 600;
     color: #ECE3CE; 
   }
+  .custom-navbar .navbar-brand:hover {
+    color: #ECE3CE; 
+  }
     .custom-navbar .navbar-brand > span {
       opacity: .4; }
   .custom-navbar .navbar-toggler {
@@ -165,23 +168,25 @@ a {
   font-weight: 600;
   padding: 12px 30px;
   border-radius: 30px;
-  color: #ffffff;
-  background: #2f2f2f;
-  border-color: #2f2f2f; }
+  color: #2f2f2f;
+  background: #ECE3CE;
+  border-color: #ECE3CE; }
   .btn:hover {
     color: #2f2f2f;
-    background: #ECE3CE;
-    border-color: #ECE3CE; }
+    background: white;
+    border-color: #2f2f2f; }
   .btn:active, .btn:focus {
     outline: none !important;
     -webkit-box-shadow: none;
     box-shadow: none; }
   .btn.btn-primary {
-    background: #243642;
-    border-color: #243642; }
+    background: white;
+    border-color: #ECE3CE; }
     .btn.btn-primary:hover {
       background: #243642;
-      border-color: #243642; }
+      border-color: #243642;
+      color: white;
+     }
   .btn.btn-secondary {
     color: #243642;
     background: #ECE3CE;
@@ -201,11 +206,11 @@ a {
       color: #ffffff; }
 
 .section-title {
-  color: #243642; }
+  color: #ECE3CE; }
 
 .product-section {
   padding: 7rem 0; 
-  background-color: #7EACB5;
+  background-color: #243642;
   color: white;
 
 }
@@ -232,7 +237,7 @@ a {
       font-weight: 800 !important;
       font-size: 18px !important; }
     .product-section .product-item h3, .product-section .product-item strong {
-      color: #2f2f2f;
+      color: white;
       text-decoration: none; }
     .product-section .product-item .icon-cross {
       position: absolute;
@@ -265,7 +270,7 @@ a {
       right: 0;
       position: absolute;
       content: "";
-      background: #bbdbd8;
+      background: white;
       height: 0%;
       z-index: -1;
       border-radius: 10px;
@@ -548,7 +553,7 @@ a {
 
 .footer-section {
   padding: 80px 0;
-  background: #ffffff; }
+  background: #ECE3CE; }
   .footer-section .relative {
     position: relative; }
   .footer-section a {
