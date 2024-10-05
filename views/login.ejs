@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+  <!-- Include the head partial -->
+  <%- include('partials/head') %>
+  <body>
+    <!-- Include the header partial -->
+    <%- include('partials/header') %>
+    
+    <!-- Dynamic body content -->
+    <main class="d-flex align-items-center justify-content-center min-vh-100">
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-md-6 col-lg-4">
+                  
+      <% if (query.verified === 'true') { %>
+        <div class="alert alert-success text-center" role="alert">
+            <h4 class="alert-heading">Email Verified!</h4>
+            <p>Your email has been successfully verified</p>
+        </div>
+    <% } %>
+            <div class="card p-4 shadow-sm">
+              <h2 class="text-center mb-4">Login</h2>
+              <form id="loginForm" action="/login-user" method="POST">
+                <div class="mb-3">
+                  <label for="email" class="form-label">Email Address</label>
+                  <input type="email" id="email" name="email" class="form-control" placeholder="Enter your email" required>
+                </div>
+                <div class="mb-3">
+                  <label for="password" class="form-label">Password</label>
+                  <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" required>
+                </div>
+                <div class="d-grid">
+                  <button type="submit" class="btn btn-primary">Login</button>
+                </div>
+              </form>
+              
+              <!-- "Already have an account?" Section -->
+              <div class="text-center mt-3">
+                <p class="small">Don't have an account? <a href="/register" class="text-decoration-none">Sign up here</a></p>
+              </div>
+              <div class="text-center mt-1">
+                <a href="a/forgot-password" class="small text-muted">Forgot password?</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    
+    </main>
+    
+    <!-- Include the footer partial -->
+    <%- include('partials/footer') %>
+    
+    <!-- Include the scripts partial -->
+    <%- include('partials/scripts') %>
+  </body>
+</html>
+
+<script>
+document.getElementById('loginForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+    // Create an object to hold the form data
+    const formData = new FormData(this);
+    const data = Object.fromEntries(formData); // Convert FormData to an object
+
+    try {
+        const response = await fetch(this.action, {
+            method: this.method,
+            headers: {
+                'Content-Type': 'application/json', // Set the content type to JSON
+            },
+            body: JSON.stringify(data), // Convert the data to JSON
+        });
+
+        const result = await response.json();
+        if (result.success) {
+            window.location.href = '/'; // Redirect to homepage or dashboard
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: result.message,
+            });
+        }
+    } catch (error) {
+        console.error('Error during login:', error); // Log any errors
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'An unexpected error occurred. Please try again later.',
+        });
+    }
+});
+
+</script>

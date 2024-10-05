@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <!-- Include the head partial -->
+  <%- include('partials/head') %>
+
+  <body>
+    <!-- Include the header partial -->
+    <%- include('partials/header') %>
+    
+    <main>
+      <div class="container my-5">
+        <div class="row">
+          <!-- Product Image -->
+          <div class="col-lg-6">
+            <img src="<%= product.image_path %>" class="img-fluid product-thumbnail" alt="<%= product.name %>">
+          </div>
+          
+          <!-- Product Details -->
+          <div class="col-lg-6">
+            <h1 class="product-title"><%= product.name %></h1>
+            <strong class="product-price">$<%= product.price %></strong>
+            <p class="product-description"><%= product.description %></p>
+            
+            <!-- Add to Cart Button -->
+            <div class="mt-4">
+              <span class="icon-cross add-to-cart" 
+                    data-id="<%= product.id %>" 
+                    data-name="<%= product.name %>" 
+                    data-price="<%= product.price %>">
+              </span>
+              <button class="btn btn-primary mt-2" onclick="addToCart(`<%= product.id %>, <%= product.name %>, <%= product.price %>, <%= product.image_path %>`)">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Start Footer Section -->
+    <footer class="footer">
+      <div class="container">
+        <div class="row">
+          <div class="col text-center">
+            <p>&copy; <%= new Date().getFullYear() %> Your Company Name. All Rights Reserved.</p>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <!-- End Footer Section -->
+
+
+    <!-- Include the scripts partial -->
+    <%- include('partials/scripts') %>
+
+    <script>
+      
+      function addToCart(productId, name, price, image) {
+        alert(image)
+        const quantity = 1; // Default quantity
+
+        fetch('/cart/add', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ productId, name, price, quantity })
+        })
+        .then(response => response.json())
+        .then(data => {
+          alert(data.message); // Show success message
+        })
+        .catch(error => {
+          console.error('Error adding item to cart:', error);
+        });
+      }
+    </script>
+  </body>
+</html>
