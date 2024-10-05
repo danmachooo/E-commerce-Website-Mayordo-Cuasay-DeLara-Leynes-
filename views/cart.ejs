@@ -40,11 +40,11 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <% if (cart && cart.length > 0) { %>
+                    <% if (cart && cart.length > 0) { console.log(cart)%>
                       <% cart.forEach(item => { %>
                         <tr id="product-<%= item.productId %>">
                           <td class="product-thumbnail">
-                            <img src="<%= item.image_path %>" alt="<%= item.name %>" class="img-fluid">
+                            <img src="/<%= item.image_path%>" class="img-fluid product-thumbnail" alt="<%= item.name %>" onerror="this.onerror=null; this.src='/path/to/default/image.jpg';">
                           </td>
                           <td class="product-name"><h2 class="h5 text-black"><%= item.name %></h2></td>
                           <td class="product-price" id="price-<%= item.productId %>">$<%= item.price %></td>
@@ -104,7 +104,7 @@
                   </div>
                   <div class="row">
                     <div class="col-md-12">
-                      <button class="btn btn-black btn-lg py-3 btn-block" onclick="window.location='/checkout'">Proceed To Checkout</button>
+                      <a class="btn btn-black btn-lg py-3 btn-block" href='/checkout-page'>Proceed To Checkout</a>
                     </div>
                   </div>
                 </div>
@@ -115,110 +115,134 @@
       </div>
       <!-- End Cart Section -->
     </main>
-
     <script>
+      // Initialize the script
       (function() {
-        'use strict';
-      
-        var quantityContainers = document.getElementsByClassName('quantity-container');
-      
-        function createBindings(quantityContainer) {
-          var quantityAmount = quantityContainer.getElementsByClassName('quantity-amount')[0];
-          var increase = quantityContainer.getElementsByClassName('increase')[0];
-          var decrease = quantityContainer.getElementsByClassName('decrease')[0];
-          var productId = quantityAmount.getAttribute('id').split('-')[1];
-      
-          increase.addEventListener('click', function () { 
-              // Increment the quantity by 1
-              updateCartQuantity(productId, 1); 
-          });
-          decrease.addEventListener('click', function () { 
-              // Decrement the quantity by 1 only if it's greater than 1
-              let currentQuantity = parseInt(quantityAmount.value);
-              if (currentQuantity > 1) {
-                  updateCartQuantity(productId, -1); 
-              }
-          });
-        }
-      
-        function init() {
-          for (var i = 0; i < quantityContainers.length; i++) {
-            createBindings(quantityContainers[i]);
+    'use strict';
+    
+    var quantityContainers = document.getElementsByClassName('quantity-container');
+
+    function init() {
+      for (let i = 0; i < quantityContainers.length; i++) { // Use 'let' instead of 'var'
+        var quantityContainer = quantityContainers[i];
+        var quantityAmount = quantityContainer.getElementsByClassName('quantity-amount')[0];
+        var increase = quantityContainer.getElementsByClassName('increase')[0];
+        var decrease = quantityContainer.getElementsByClassName('decrease')[0];
+        let productId = quantityAmount.getAttribute('id').split('-')[1]; // Use 'let' to ensure correct scope
+
+        // Remove any existing event listeners (if any)
+        increase.replaceWith(increase.cloneNode(true)); // Cloning the button to avoid duplicated listeners
+        decrease.replaceWith(decrease.cloneNode(true)); // Cloning the button to avoid duplicated listeners
+
+        // Bind the events without checking if they're already bound
+        increase.addEventListener('click', function() {
+          window.updateCartQuantity(productId, 1);
+        });
+
+        decrease.addEventListener('click', function() {
+          let currentQuantity = parseInt(quantityAmount.value);
+          if (currentQuantity > 1) {
+            window.updateCartQuantity(productId, -1);
           }
-        }
-      
-        // Function to update the cart quantity and recalculate subtotal and total
-        function updateCartQuantity(productId, change) {
-          const quantityInput = document.getElementById(`quantity-${productId}`);
-          let currentQuantity = parseInt(quantityInput.value) || 0;
-      
-          const newQuantity = currentQuantity + change;
-          if (newQuantity < 1) return; // Prevent setting quantity to less than 1
-      
-          quantityInput.value = newQuantity; // Update the quantity in the input field
-      
-          // Send the PUT request to update the cart
-          fetch(`/cart/update/${productId}`, {
-              method: 'PUT',
-              headers: {
-                  'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ quantity: newQuantity }), // Send the new quantity
-          })
-          .then(response => {
-              if (response.ok) {
-                  console.log('Item updated successfully');
-                  updateCartTotal(productId, newQuantity); // Update the total for the item
-              } else {
-                  return response.json().then(data => {
-                      throw new Error(data.message);
-                  });
-              }
-          })
-          .catch(error => {
-              console.error('Error:', error);
-          });
-        }
-      
+        });
+      }
+    }
+
+    // Define the function in the global scope
+    window.updateCartQuantity = function(productId, change) {
+      const quantityInput = document.getElementById(`quantity-${productId}`);
+      let currentQuantity = parseInt(quantityInput.value) || 0;
+
+      const newQuantity = currentQuantity + change;
+      if (newQuantity < 1) return; // Prevent setting quantity to less than 1
+
+      quantityInput.value = newQuantity; // Update the quantity in the input field
+
+      // Send the PUT request to update the cart
+      fetch(`/cart/update/${productId}`, {
+          method: 'PUT',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ quantity: newQuantity }), // Send the new quantity
+      })
+      .then(response => {
+          if (response.ok) {
+              console.log('Item updated successfully');
+              updateCartTotal(productId, newQuantity); // Update the total for the item
+              recalculateGrandTotal(); // Recalculate the grand total
+          } else {
+              return response.json().then(data => {
+                  throw new Error(data.message);
+              });
+          }
+      })
+      .catch(error => {
+          console.error('Error:', error);
+      });
+    };
+    
         // Function to update the total for a single product
         function updateCartTotal(productId, quantity) {
-          const price = parseFloat(document.getElementById(`price-${productId}`).innerText.replace('$', ''));
+          const priceText = document.getElementById(`price-${productId}`).innerText;
+          const price = parseFloat(priceText.replace('$', '').replace(',', '')); // Ensure comma is removed if present
+    
           const totalElement = document.getElementById(`total-${productId}`);
-      
+          
+          // Check if price is a valid number
+          if (isNaN(price)) {
+              console.error(`Invalid price for product ${productId}: ${priceText}`);
+              return;
+          }
+    
           const newTotal = (price * quantity).toFixed(2);
           totalElement.innerText = `$${newTotal}`;
-      
+    
           // Recalculate the subtotal for the entire cart
           recalculateSubtotal();
         }
-      
+    
         // Function to recalculate the subtotal
         function recalculateSubtotal() {
           const totalElements = document.querySelectorAll('.product-total');
           let subtotal = 0;
-      
+    
           totalElements.forEach(element => {
-              subtotal += parseFloat(element.innerText.replace('$', ''));
+              const totalText = element.innerText;
+              const totalValue = parseFloat(totalText.replace('$', '').replace(',', '')); // Ensure comma is removed if present
+              
+              // Check if totalValue is a valid number
+              if (isNaN(totalValue)) {
+                  console.error(`Invalid total value: ${totalText}`);
+                  return;
+              }
+    
+              subtotal += totalValue;
           });
-      
+    
           document.getElementById('cart-subtotal').innerText = `$${subtotal.toFixed(2)}`;
           document.getElementById('cart-total').innerText = `$${subtotal.toFixed(2)}`;
-          document.getElementById('grand-total').innerText = `$${subtotal.toFixed(2)}`;
+          recalculateGrandTotal(); // Update the grand total after subtotal changes
         }
-      
+    
+        // Function to recalculate the grand total
+        function recalculateGrandTotal() {
+          const subtotal = parseFloat(document.getElementById('cart-subtotal').innerText.replace('$', '').replace(',', '')); // Ensure comma is removed if present
+          document.getElementById('grand-total').innerText = `$${subtotal.toFixed(2)}`; // Ensure grand total reflects the subtotal
+        }
+    
         // Function to remove an item from the cart
         window.removeCartItem = function(productId) {
           const row = document.getElementById(`product-${productId}`);
-          // Send DELETE request to the server
           fetch(`/cart/remove/${productId}`, {
               method: 'DELETE',
           })
           .then(response => {
               if (response.ok) {
                   console.log('Item removed successfully');
-                  row.remove(); // Remove the row from the table
+                  row.remove();
+                  recalculateSubtotal(); // Recalculate the totals after removal
                   location.reload();
-                  recalculateSubtotal(); // Recalculate the totals
               } else {
                   return response.json().then(data => {
                       throw new Error(data.message);
@@ -229,9 +253,12 @@
               console.error('Error:', error);
           });
         }
-
+    
         init(); // Initialize event bindings
       })();
     </script>
+    
+    
+    
   </body>
 </html>

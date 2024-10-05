@@ -35,7 +35,7 @@ const ProductController = {
         try {
             const productId = req.params.id;
             const product = await Product.findById(productId); // Fetch product by ID
-            console.log('Product Details: ', product)
+            console.log('Product image path: ', product.image_path);
             res.render('product', { product, title: product.name });
         } catch (error) {
             res.status(500).json({ message: 'Error retrieving product.', error: error.message });
