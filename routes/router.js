@@ -44,6 +44,11 @@ router.delete('/cart/clear', CartController.clearCart);
 
 // Checkout route
 router.post('/checkout', CheckoutController.checkout);
+router.get('/checkout-page', CheckoutController.renderCheckout);
+
+router.get('/thankyou', (req, res) => {
+    res.render('thankyou', { title: 'Thank You' }); // Render your thank you EJS page
+});
 
 // Protected shop route
 router.get('/shop', authMiddleware, ProductController.getAll);

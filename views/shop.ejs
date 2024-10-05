@@ -46,6 +46,7 @@
                           data-id="<%= product.id %>" 
                           data-name="<%= product.name %>" 
                           data-price="<%= product.price %>"
+                          data-image="<%=product.image_path%>"
                           >
                       <img src="/uploads/images/cross.svg" class="img-fluid" alt="Add to Cart Icon">
                     </span>
@@ -75,14 +76,15 @@
           const productId = this.getAttribute('data-id');
           const name = this.getAttribute('data-name');
           const price = parseFloat(this.getAttribute('data-price'));
+          const image_path = this.getAttribute('data-image');
           const quantity = 1; // Default quantity
-    
+          console.log('Shop View', image_path);
           fetch('/cart/add', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ productId, name, price, quantity })
+            body: JSON.stringify({ productId, name, price, quantity, image_path })
           })
           .then(response => response.json())
           .then(data => {
