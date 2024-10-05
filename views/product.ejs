@@ -12,7 +12,7 @@
         <div class="row">
           <!-- Product Image -->
           <div class="col-lg-6">
-            <img src="<%= product.image_path %>" class="img-fluid product-thumbnail" alt="<%= product.name %>">
+            <img src="/<%= product.image_path %>" class="img-fluid product-thumbnail" alt="<%= product.name %>">
           </div>
           
           <!-- Product Details -->
@@ -28,7 +28,12 @@
                     data-name="<%= product.name %>" 
                     data-price="<%= product.price %>">
               </span>
-              <button class="btn btn-primary mt-2" onclick="addToCart(`<%= product.id %>, <%= product.name %>, <%= product.price %>, <%= product.image_path %>`)">Add to Cart</button>
+              <!-- Corrected function call -->
+              <button class="btn btn-primary mt-2 add-to-cart" data-id="<%= product.id %>" 
+                data-name="<%= product.name %>" 
+                data-price="<%= product.price %>"
+                data-image="<%=product.image_path%>">Add to Cart
+              </button>
             </div>
           </div>
         </div>
@@ -47,31 +52,36 @@
     </footer>
     <!-- End Footer Section -->
 
-
     <!-- Include the scripts partial -->
     <%- include('partials/scripts') %>
 
     <script>
-      
-      function addToCart(productId, name, price, image) {
-        alert(image)
-        const quantity = 1; // Default quantity
-
-        fetch('/cart/add', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ productId, name, price, quantity })
-        })
-        .then(response => response.json())
-        .then(data => {
-          alert(data.message); // Show success message
-        })
-        .catch(error => {
-          console.error('Error adding item to cart:', error);
+      document.querySelectorAll('.add-to-cart').forEach(icon => {
+        icon.addEventListener('click', function(event) {
+          event.preventDefault(); // Prevent the default anchor behavior
+    
+          const productId = this.getAttribute('data-id');
+          const name = this.getAttribute('data-name');
+          const price = parseFloat(this.getAttribute('data-price'));
+          const image_path = this.getAttribute('data-image');
+          const quantity = 1; // Default quantity
+          console.log('Product View', image_path);
+          fetch('/cart/add', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ productId, name, price, quantity, image_path })
+          })
+          .then(response => response.json())
+          .then(data => {
+            alert(data.message); // Show success message
+          })
+          .catch(error => {
+            console.error('Error adding item to cart:', error);
+          });
         });
-      }
+      });
     </script>
   </body>
 </html>

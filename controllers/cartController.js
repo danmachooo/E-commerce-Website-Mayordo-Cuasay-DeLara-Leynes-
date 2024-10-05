@@ -1,3 +1,5 @@
+const Product = require('../models/product');
+
 const CartController = {
     // Helper function to calculate total price of the cart
     calculateTotal: (cart) => {
@@ -6,28 +8,31 @@ const CartController = {
 
     // Add item to cart or update quantity if it already exists
     addItem: (req, res) => {
-        const { productId, name, price, quantity } = req.body;
-
+        const { productId, name, price, quantity, image_path } = req.body; // Include image_path
+        //const product = Product.findById(productId);
+        console.log('Product file is', image_path)
         if (!req.session.cart) {
             req.session.cart = []; // Initialize cart if it doesn't exist
         }
-
+    
         // Ensure quantity is a valid positive number
         if (quantity <= 0) {
             return res.status(400).json({ message: 'Invalid quantity.' });
         }
-
+    
         // Check if the item is already in the cart
         const existingItem = req.session.cart.find(item => item.productId === productId);
-
+        console.log('Test: ',image_path);
         if (existingItem) {
             existingItem.quantity += quantity; // Update quantity if item already exists
         } else {
-            req.session.cart.push({ productId, name, price, quantity }); // Add new item to cart
+            // Add new item to cart including the image_path
+            req.session.cart.push({ productId, name, price, quantity, image_path });
         }
-
+        console.log('From Cart Controller', req.session.cart);
         res.status(200).json({ message: 'Item added to cart successfully.' });
     },
+    
 
     // View the cart and calculate total price
     viewCart: (req, res) => {
@@ -38,8 +43,8 @@ const CartController = {
     },
 
     updateItem: (req, res) => {
-        console.log('Updating item with body:', req.body);
-        const { productId, quantity } = req.body;
+        const { productId } = req.params;  // productId from URL
+        const { quantity } = req.body;     // quantity from the request body
     
         // Check if productId or quantity is missing
         if (!productId || !quantity) {
@@ -53,12 +58,13 @@ const CartController = {
     
         const item = req.session.cart.find(item => item.productId === productId);
         if (item) {
-            item.quantity = quantity; // Update quantity if item exists
+            item.quantity = quantity; // Update the quantity in the cart
             res.status(200).json({ message: 'Cart item updated successfully.' });
         } else {
             res.status(404).json({ message: 'Item not found in cart.' });
         }
     },
+    
     
     
 
