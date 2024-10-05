@@ -180,12 +180,14 @@ a {
     -webkit-box-shadow: none;
     box-shadow: none; }
   .btn.btn-primary {
-    background: white;
-    border-color: #ECE3CE; }
+    background: #243642;
+    border-color: #243642;
+    color: white;
+   }
     .btn.btn-primary:hover {
-      background: #243642;
-      border-color: #243642;
-      color: white;
+      background: #ECE3CE;
+      border-color: #ECE3CE;
+      color: #243642;
      }
   .btn.btn-secondary {
     color: #243642;
