@@ -31,12 +31,15 @@ a {
     font-weight: 600; }
 
 .custom-navbar {
-  background: #3b5d50 !important;
+  background: #243642 !important;
   padding-top: 20px;
-  padding-bottom: 20px; }
+  padding-bottom: 20px;
+ }
   .custom-navbar .navbar-brand {
     font-size: 32px;
-    font-weight: 600; }
+    font-weight: 600;
+    color: #ECE3CE; 
+  }
     .custom-navbar .navbar-brand > span {
       opacity: .4; }
   .custom-navbar .navbar-toggler {
@@ -64,7 +67,7 @@ a {
         bottom: 0;
         left: 8px;
         right: 8px;
-        background: #f9bf29;
+        background: #ECE3CE;
         height: 5px;
         opacity: 1;
         visibility: visible;
@@ -96,7 +99,7 @@ a {
         margin-right: 20px; }
 
 .hero {
-  background: #3b5d50;
+  background: white;
   padding: calc(4rem - 30px) 0 0rem 0; }
   @media (min-width: 768px) {
     .hero {
@@ -112,13 +115,13 @@ a {
         max-width: 450px; } }
   .hero h1 {
     font-weight: 700;
-    color: #ffffff;
+    color: #243642;
     margin-bottom: 30px; }
     @media (min-width: 1400px) {
       .hero h1 {
         font-size: 54px; } }
   .hero p {
-    color: rgba(255, 255, 255, 0.5);
+    color: #243642;
     margin-botom: 30px; }
   .hero .hero-img-wrap {
     position: relative; }
@@ -166,46 +169,55 @@ a {
   background: #2f2f2f;
   border-color: #2f2f2f; }
   .btn:hover {
-    color: #ffffff;
-    background: #222222;
-    border-color: #222222; }
+    color: #2f2f2f;
+    background: #ECE3CE;
+    border-color: #ECE3CE; }
   .btn:active, .btn:focus {
     outline: none !important;
     -webkit-box-shadow: none;
     box-shadow: none; }
   .btn.btn-primary {
-    background: #3b5d50;
-    border-color: #3b5d50; }
+    background: #243642;
+    border-color: #243642; }
     .btn.btn-primary:hover {
-      background: #314d43;
-      border-color: #314d43; }
+      background: #243642;
+      border-color: #243642; }
   .btn.btn-secondary {
-    color: #2f2f2f;
-    background: #f9bf29;
-    border-color: #f9bf29; }
+    color: #243642;
+    background: #ECE3CE;
+    border-color: #ECE3CE; }
     .btn.btn-secondary:hover {
-      background: #f8b810;
-      border-color: #f8b810; }
+      background: #243642;
+      border-color: #243642; 
+      color: #ECE3CE;
+    }
+
   .btn.btn-white-outline {
     background: transparent;
     border-width: 2px;
-    border-color: rgba(255, 255, 255, 0.3); }
+    border-color: #243642; }
     .btn.btn-white-outline:hover {
       border-color: white;
       color: #ffffff; }
 
 .section-title {
-  color: #2f2f2f; }
+  color: #243642; }
 
 .product-section {
-  padding: 7rem 0; }
+  padding: 7rem 0; 
+  background-color: #7EACB5;
+  color: white;
+
+}
   .product-section .product-item {
     text-align: center;
     text-decoration: none;
     display: block;
     position: relative;
     padding-bottom: 50px;
-    cursor: pointer; }
+    cursor: pointer; 
+
+  }
     .product-section .product-item .product-thumbnail {
       margin-bottom: 30px;
       position: relative;
@@ -253,7 +265,7 @@ a {
       right: 0;
       position: absolute;
       content: "";
-      background: #dce5e4;
+      background: #bbdbd8;
       height: 0%;
       z-index: -1;
       border-radius: 10px;
