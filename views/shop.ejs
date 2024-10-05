@@ -1,6 +1,100 @@
-<%- include('partials/start') %>
-<%- include('partials/navbar') %>
-<%- include('partials/heroshop') %>
-<%- include('partials/prodsec') %>
-<%- include('partials/footer') %>
-<%- include('partials/end') %>
+<!doctype html>
+<html lang="en">
+  <%- include('partials/head') %>
+  <body>
+    <%- include('partials/header') %>
+
+    <main>
+      <div class="hero">
+        <div class="container">
+          <div class="row justify-content-between">
+            <div class="col-lg-5">
+              <div class="intro-excerpt">
+                <h1>Shop</h1>
+              </div>
+            </div>
+            <div class="col-lg-7"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Start Category Filter -->
+      <div class="container my-4">
+        <form action="/shop" method="GET">
+          <select name="categoryId" onchange="this.form.submit();">
+            <option value="">All Categories</option>
+            <% categories.forEach(category => { %>
+              <option value="<%= category.id %>" <%= category.id == (selectedCategoryId || '') ? 'selected' : '' %>><%= category.name %></option>
+            <% }); %>
+          </select>
+        </form>
+      </div>
+      <!-- End Category Filter -->
+
+      <!-- Start Product Section -->
+      <div class="untree_co-section product-section before-footer-section">
+        <div class="container">
+          <div class="row">
+            <% if (products && products.length > 0) { %>
+              <% products.forEach(function(product) { %>
+                <div class="col-12 col-md-4 col-lg-3 mb-5 mb-md-0">
+                  <a class="product-item" href="/product/<%= product.id %>"> <!-- Link to the product details page -->
+                    <img src="<%= product.image_path %>" class="img-fluid product-thumbnail" alt="<%= product.name %>">
+                    <h3 class="product-title"><%= product.name %></h3>
+                    <strong class="product-price">$<%= product.price %></strong>
+                    <span class="icon-cross add-to-cart" 
+                          data-id="<%= product.id %>" 
+                          data-name="<%= product.name %>" 
+                          data-price="<%= product.price %>"
+                          >
+                      <img src="/uploads/images/cross.svg" class="img-fluid" alt="Add to Cart Icon">
+                    </span>
+                  </a>
+                </div>
+              <% }); %>
+            <% } else { %>
+              <div class="col-12">
+                <h2>No Products Available</h2>
+                <p>Currently, there are no products in the shop. Please check back later!</p>
+              </div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+      <!-- End Product Section -->
+
+    </main>
+
+    <%- include('partials/footer') %>
+    <%- include('partials/scripts') %>
+    <script>
+      document.querySelectorAll('.icon-cross.add-to-cart').forEach(icon => {
+        icon.addEventListener('click', function(event) {
+          event.preventDefault(); // Prevent the default anchor behavior
+    
+          const productId = this.getAttribute('data-id');
+          const name = this.getAttribute('data-name');
+          const price = parseFloat(this.getAttribute('data-price'));
+          const quantity = 1; // Default quantity
+    
+          fetch('/cart/add', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ productId, name, price, quantity })
+          })
+          .then(response => response.json())
+          .then(data => {
+            alert(data.message); // Show success message
+          })
+          .catch(error => {
+            console.error('Error adding item to cart:', error);
+          });
+        });
+      });
+    </script>
+    
+    
+  </body>
+</html>

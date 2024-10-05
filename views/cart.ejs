@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+  <!-- Include the head partial -->
+  <%- include('partials/head') %>
+
+  <body>
+    <!-- Include the header partial -->
+    <%- include('partials/header') %>
+    
+    <main>
+      <!-- Start Hero Section -->
+      <div class="hero">
+        <div class="container">
+          <div class="row justify-content-between">
+            <div class="col-lg-5">
+              <div class="intro-excerpt">
+                <h1>Your Cart</h1>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- End Hero Section -->
+
+      <!-- Start Cart Section -->
+      <div class="untree_co-section before-footer-section">
+        <div class="container">
+          <div class="row mb-5">
+            <form class="col-md-12" method="post">
+              <div class="site-blocks-table">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th class="product-thumbnail">Image</th>
+                      <th class="product-name">Product</th>
+                      <th class="product-price">Price</th>
+                      <th class="product-quantity">Quantity</th>
+                      <th class="product-total">Total</th>
+                      <th class="product-remove">Remove</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% if (cart && cart.length > 0) { %>
+                      <% cart.forEach(item => { %>
+                        <tr id="product-<%= item.productId %>">
+                          <td class="product-thumbnail">
+                            <img src="<%= item.image_path %>" alt="<%= item.name %>" class="img-fluid">
+                          </td>
+                          <td class="product-name"><h2 class="h5 text-black"><%= item.name %></h2></td>
+                          <td class="product-price" id="price-<%= item.productId %>">$<%= item.price %></td>
+                          <td>
+                            <div class="input-group mb-3 d-flex align-items-center quantity-container" style="max-width: 120px;">
+                              <div class="input-group-prepend">
+                                <button class="btn btn-outline-black decrease" type="button" onclick="updateCartQuantity('<%= item.productId %>', -1)">−</button>
+                              </div>
+                              <input type="text" class="form-control text-center quantity-amount" id="quantity-<%= item.productId %>" value="<%= item.quantity %>" readonly>
+                              <div class="input-group-append">
+                                <button class="btn btn-outline-black increase" type="button" onclick="updateCartQuantity('<%= item.productId %>', 1)">+</button>
+                              </div>
+                            </div>
+                          </td>
+                          <td class="product-total" id="total-<%= item.productId %>">$<%= (item.price * item.quantity).toFixed(2) %></td>
+                          <td>
+                            <a href="#" class="btn btn-black btn-sm" onclick="removeCartItem('<%= item.productId %>')">X</a>
+                          </td>
+                        </tr>
+                      <% }) %>
+                    <% } else { %>
+                      <tr>
+                        <td colspan="6" class="text-center">Your cart is empty.</td>
+                      </tr>
+                    <% } %>
+                  </tbody>
+                </table>
+              </div>
+            </form>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="row mb-5">
+                <div class="col-md-6">
+                  <a href="/shop" class="btn btn-outline-black btn-sm btn-block">Continue Shopping</a>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6 pl-5">
+              <div class="row justify-content-end">
+                <div class="col-md-7">
+                  <div class="row">
+                    <div class="col-md-12 text-right border-bottom mb-5">
+                      <h3 class="text-black h4 text-uppercase">Cart Totals</h3>
+                    </div>
+                  </div>
+                  <div class="row mb-3">
+                    <div class="col-md-6"><span class="text-black">Subtotal</span></div>
+                    <div class="col-md-6 text-right"><strong class="text-black" id="cart-subtotal">$<%= cart.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2) %></strong></div>
+                  </div>
+                  <div class="row mb-5">
+                    <div class="col-md-6"><span class="text-black">Total</span></div>
+                    <div class="col-md-6 text-right"><strong class="text-black" id="cart-total">$<%= cart.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2) %></strong></div>
+                  </div>
+                  <div>
+                    <h2>Grand Total: <span id="grand-total">$0.00</span></h2>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-12">
+                      <button class="btn btn-black btn-lg py-3 btn-block" onclick="window.location='/checkout'">Proceed To Checkout</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- End Cart Section -->
+    </main>
+
+    <script>
+      (function() {
+        'use strict';
+      
+        var quantityContainers = document.getElementsByClassName('quantity-container');
+      
+        function createBindings(quantityContainer) {
+          var quantityAmount = quantityContainer.getElementsByClassName('quantity-amount')[0];
+          var increase = quantityContainer.getElementsByClassName('increase')[0];
+          var decrease = quantityContainer.getElementsByClassName('decrease')[0];
+          var productId = quantityAmount.getAttribute('id').split('-')[1];
+      
+          increase.addEventListener('click', function () { 
+              // Increment the quantity by 1
+              updateCartQuantity(productId, 1); 
+          });
+          decrease.addEventListener('click', function () { 
+              // Decrement the quantity by 1 only if it's greater than 1
+              let currentQuantity = parseInt(quantityAmount.value);
+              if (currentQuantity > 1) {
+                  updateCartQuantity(productId, -1); 
+              }
+          });
+        }
+      
+        function init() {
+          for (var i = 0; i < quantityContainers.length; i++) {
+            createBindings(quantityContainers[i]);
+          }
+        }
+      
+        // Function to update the cart quantity and recalculate subtotal and total
+        function updateCartQuantity(productId, change) {
+          const quantityInput = document.getElementById(`quantity-${productId}`);
+          let currentQuantity = parseInt(quantityInput.value) || 0;
+      
+          const newQuantity = currentQuantity + change;
+          if (newQuantity < 1) return; // Prevent setting quantity to less than 1
+      
+          quantityInput.value = newQuantity; // Update the quantity in the input field
+      
+          // Send the PUT request to update the cart
+          fetch(`/cart/update/${productId}`, {
+              method: 'PUT',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ quantity: newQuantity }), // Send the new quantity
+          })
+          .then(response => {
+              if (response.ok) {
+                  console.log('Item updated successfully');
+                  updateCartTotal(productId, newQuantity); // Update the total for the item
+              } else {
+                  return response.json().then(data => {
+                      throw new Error(data.message);
+                  });
+              }
+          })
+          .catch(error => {
+              console.error('Error:', error);
+          });
+        }
+      
+        // Function to update the total for a single product
+        function updateCartTotal(productId, quantity) {
+          const price = parseFloat(document.getElementById(`price-${productId}`).innerText.replace('$', ''));
+          const totalElement = document.getElementById(`total-${productId}`);
+      
+          const newTotal = (price * quantity).toFixed(2);
+          totalElement.innerText = `$${newTotal}`;
+      
+          // Recalculate the subtotal for the entire cart
+          recalculateSubtotal();
+        }
+      
+        // Function to recalculate the subtotal
+        function recalculateSubtotal() {
+          const totalElements = document.querySelectorAll('.product-total');
+          let subtotal = 0;
+      
+          totalElements.forEach(element => {
+              subtotal += parseFloat(element.innerText.replace('$', ''));
+          });
+      
+          document.getElementById('cart-subtotal').innerText = `$${subtotal.toFixed(2)}`;
+          document.getElementById('cart-total').innerText = `$${subtotal.toFixed(2)}`;
+          document.getElementById('grand-total').innerText = `$${subtotal.toFixed(2)}`;
+        }
+      
+        // Function to remove an item from the cart
+        window.removeCartItem = function(productId) {
+          const row = document.getElementById(`product-${productId}`);
+          // Send DELETE request to the server
+          fetch(`/cart/remove/${productId}`, {
+              method: 'DELETE',
+          })
+          .then(response => {
+              if (response.ok) {
+                  console.log('Item removed successfully');
+                  row.remove(); // Remove the row from the table
+                  location.reload();
+                  recalculateSubtotal(); // Recalculate the totals
+              } else {
+                  return response.json().then(data => {
+                      throw new Error(data.message);
+                  });
+              }
+          })
+          .catch(error => {
+              console.error('Error:', error);
+          });
+        }
+
+        init(); // Initialize event bindings
+      })();
+    </script>
+  </body>
+</html>

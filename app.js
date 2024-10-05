@@ -1,4 +1,3 @@
-const bodyParser = require('body-parser');
 const express = require('express');
 const session = require('express-session');
 const routes = require('./routes/router');
@@ -8,15 +7,29 @@ const port = 3000;
 const app = express();
 
 app.set('view engine', 'ejs');
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json()); // Add support for JSON requests
+
 app.use(session({
     secret: 'hello_world_my_secret_key',
     resave: false,
     saveUninitialized: true
 }));
+app.use((req, res, next) => {
+    res.locals.session = req.session; // Make session available in EJS views
+    next();
+});
+
 app.use(cors());
 app.use(express.static('public'));
-app.use('/', routes);
+app.use('/uploads', express.static('uploads'));
+
+// Homepage Route
+app.get('/', (req, res) => {
+    res.render('index'); // Render the homepage view (home.ejs)
+});
+
+app.use('/', routes)
 
 app.use((err, req, res, next) => {
     console.error(err.stack);
