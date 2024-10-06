@@ -76,14 +76,18 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
 
         const result = await response.json();
         if (result.success) {
-            window.location.href = '/'; // Redirect to homepage or dashboard
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: result.message,
-            });
-        }
+          if (result.message === 'admin') {
+              window.location.href = '/admin'; // Redirect admin to /admin page
+          } else if (result.message === 'customer') {
+              window.location.href = '/'; // Redirect customer to home page
+          }
+      } else {
+          Swal.fire({
+              icon: 'error',
+              title: 'Login Failed',
+              text: result.message,
+          });
+      }
     } catch (error) {
         console.error('Error during login:', error); // Log any errors
         Swal.fire({

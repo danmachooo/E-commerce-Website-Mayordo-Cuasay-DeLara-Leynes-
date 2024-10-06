@@ -8,6 +8,9 @@ const Order = {
         );
         return result.insertId; // Return the ID of the created order
     },
+    findAll: async () => {
+        const [rows] = await pool.query('SELECT * FROM orders');
+    },
 
     findById: async (id) => {
         const [rows] = await pool.query('SELECT * FROM orders WHERE id = ?', [id]);

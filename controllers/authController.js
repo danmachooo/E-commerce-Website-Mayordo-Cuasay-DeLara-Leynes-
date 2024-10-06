@@ -3,7 +3,7 @@ const crypto = require('crypto');
 const User = require('../models/user');
 const emailService = require('../services/emailService');
 const { title } = require('process');
-const { query } = require('express');
+const { query } = require('express'); 
 
 const register = async (req, res) => {
     const {email, name, password} = req.body;
@@ -56,16 +56,26 @@ const login = async (req, res) => {
         }
 
         req.session.userId = user.id;
+        const role = user.role;
+        console.log('Role: ', role)
+        const status = 'active';
+        await User.setStatus(user.id, status);
 
+        if(role === 'admin') {
+            res.status(200).json({ success: true, message: role });
+        } else {
+            res.status(200).json({ success: true, message: role });
+        }
         // Respond with success
-        res.status(200).json({ success: true });
     } catch (error) {
         console.error('Login error:', error);
         res.status(500).json({ success: false, message: 'Server error during login.' });
     }
 };
 
-const logout = (req, res) => {
+const logout = async (req, res) => {
+    const status = 'not active';
+    await User.setStatus(req.session.id, status);
     req.session.destroy(err => {
         if (err) {
             console.error('Logout error:', err);

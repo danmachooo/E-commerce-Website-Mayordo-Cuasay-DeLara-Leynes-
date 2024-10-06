@@ -48,6 +48,14 @@ const OrderController = {
         } catch (error) {
             res.status(500).json({ message: 'Error updating order status.', error: error.message });
         }
+    },
+    getAll: async (req, res) => {
+        try {
+            const orders = await Order.findAll();
+            console.log('Orders: ', orders);
+        } catch(error){
+            console.error('Error displaying orders: ', error);
+        }
     }
 };
 

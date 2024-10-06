@@ -39,7 +39,7 @@
               <% products.forEach(function(product) { %>
                 <div class="col-12 col-md-4 col-lg-3 mb-5 mb-md-0">
                   <a class="product-item" href="/product/<%= product.id %>"> <!-- Link to the product details page -->
-                    <img src="<%= product.image_path %>" class="img-fluid product-thumbnail" alt="<%= product.name %>">
+                    <img src="/uploads/<%= product.image_path %>" class="img-fluid product-thumbnail" alt="<%= product.name %>">
                     <h3 class="product-title"><%= product.name %></h3>
                     <strong class="product-price">$<%= product.price %></strong>
                     <span class="icon-cross add-to-cart" 
