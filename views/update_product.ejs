@@ -122,6 +122,7 @@
                 body: formData,
             })
             .then(response => {
+                console.log('Error here: ',response)
                 if (response.ok) {
                     swal({
                         title: "Success!",

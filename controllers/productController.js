@@ -140,6 +140,7 @@ const ProductController = {
             
             // Optionally return the updated product details
             const updatedProduct = await Product.findById(id); // Fetch the updated product
+            
             res.status(200).json({ message: 'Product updated successfully.', product: updatedProduct });
         } catch (error) {
             console.error('Error updating product:', error);

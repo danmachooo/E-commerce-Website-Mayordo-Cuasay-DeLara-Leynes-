@@ -8,12 +8,23 @@ const Order = {
         );
         return result.insertId; // Return the ID of the created order
     },
+
     findAll: async () => {
-        const [rows] = await pool.query('SELECT * FROM orders');
+        const [rows] = await pool.query(`
+            SELECT o.*, u.name as user_name 
+            FROM orders o
+            JOIN users u ON o.user_id = u.id
+        `);
+        return rows; // Return all orders with associated user details
     },
 
     findById: async (id) => {
-        const [rows] = await pool.query('SELECT * FROM orders WHERE id = ?', [id]);
+        const [rows] = await pool.query(`
+            SELECT o.*, u.name as user_name
+            FROM orders o
+            JOIN users u ON o.user_id = u.id
+            WHERE o.id = ?
+        `, [id]);
         return rows[0]; // Return the order object if found
     },
 
@@ -24,7 +35,11 @@ const Order = {
 
     updateStatus: async (orderId, status) => {
         await pool.query('UPDATE orders SET order_status = ? WHERE id = ?', [status, orderId]);
+    },
+    delete: async (id) => {
+        await pool.query('DELETE FROM orders WHERE id = ?', [id]);
     }
+    
 };
 
 module.exports = Order;
