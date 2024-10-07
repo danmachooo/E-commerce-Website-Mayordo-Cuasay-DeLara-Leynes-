@@ -1,4 +1,4 @@
-const { pool } = require('../config/db'); // Adjust the path as necessary
+const { pool } = require('../config/db'); 
 
 const User = {
     create: async (name, email, password, verificationToken, tokenExpiry) => {

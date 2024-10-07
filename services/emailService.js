@@ -4,8 +4,8 @@ const nodemailer = require('nodemailer');
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: 'johnpauldanmachi@gmail.com', // Your email address
-        pass: 'iwbv qots bvxc gdzj' // Your email password or App Password
+        user: 'johnpauldanmachi@gmail.com', 
+        pass: 'iwbv qots bvxc gdzj' 
     }
 });
 
@@ -13,7 +13,7 @@ const sendVerificationEmail = (email, verificationToken) => {
     const verificationLink = `http://localhost:3000/verify/${verificationToken}`;
 
     const mailOptions = {
-        from: '"Furni" <johnpauldanmachi@gmail.com>', // Correctly format sender address
+        from: '"Furni" <johnpauldanmachi@gmail.com>', 
         to: email, // List of recipients
         subject: 'Email Verification', // Subject line
         text: `Please verify your email by clicking the link: ${verificationLink}`, // Plain text body

@@ -1,11 +1,10 @@
 const Order = require('../models/order');
 const OrderItem = require('../models/orderItem');
 const User = require('../models/user')
-const Product = require('../models/product'); // Import the Product model
-
+const Product = require('../models/product'); 
 const CheckoutController = {
     checkout: async (req, res) => {
-        const userId = req.session.userId; // Assuming user ID is stored in the session
+        const userId = req.session.userId; 
         const cart = req.session.cart || [];
 
         if (!cart.length) {
@@ -34,13 +33,12 @@ const CheckoutController = {
         // Clear the cart after successful checkout
         req.session.cart = [];
         // res.status(201).json({ message: 'Order created successfully.', orderId });
-        return res.redirect('/thankyou'); // Adjust the path based on your routing
-
+        return res.redirect('/thankyou'); 
     },
     
     renderCheckout: async (req, res) => {
         const userId = req.session.userId; // Get user ID from the session
-        const user = await User.findById(userId); // Fetch user details from your User model
+        const user = await User.findById(userId); 
         const cart = req.session.cart || []; // Get cart items from the session
 
         res.render('checkout', {

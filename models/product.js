@@ -8,7 +8,7 @@ const Product = {
         if (newCategory) {
             try {
                 const result = await this.addCategory(newCategory);
-                actualCategoryId = result.insertId; // Use the ID of the newly created category
+                actualCategoryId = result.insertId; 
             } catch (error) {
                 console.error('Error adding new category:', error);
                 throw new Error('Could not create new category');
@@ -121,8 +121,8 @@ const Product = {
         const values = [];
 
         if (categoryId) {
-            query += ' WHERE category_id = ?'; // Using the placeholder for parameter binding
-            values.push(categoryId);             // Adding the categoryId to the values array
+            query += ' WHERE category_id = ?'; 
+            values.push(categoryId);            
         }
 
         console.log('SQL Query:', query);  // Log the query for debugging

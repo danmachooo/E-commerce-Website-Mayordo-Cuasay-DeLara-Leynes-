@@ -1,10 +1,9 @@
 const Product = require('../models/product');
-const fs = require('fs').promises; // Use promises API for fs
+const fs = require('fs').promises; 
 const path = require('path');
 
 const ProductController = {
     create: async (req, res) => {
-        // Destructure necessary fields from req.body
         const { name, description, price, stock_quantity, category_id, new_category } = req.body;
     
         // Input validation
@@ -16,16 +15,16 @@ const ProductController = {
             let image_path = null;
             // Check if an image file is uploaded
             if (req.file) {
-                image_path = req.file.filename; // Store the image path (filename)
+                image_path = req.file.filename; 
             }
     
             // Initialize category_id to the passed category_id
-            let finalCategoryId = category_id ? parseInt(category_id) : null; // Ensure category_id is parsed
+            let finalCategoryId = category_id ? parseInt(category_id) : null; 
     
             // Check if a new category is being added
             if (new_category) {
-                const newCategory = await Product.addCategory(new_category.trim()); // Create new category
-                finalCategoryId = newCategory.insertId; // Use the insertId from the new category
+                const newCategory = await Product.addCategory(new_category.trim()); 
+                finalCategoryId = newCategory.insertId; 
             }
     
             // Call the model to create the product
