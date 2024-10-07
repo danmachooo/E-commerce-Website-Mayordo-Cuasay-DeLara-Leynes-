@@ -18,7 +18,6 @@ const methods = {
             const { role, status } = req.body;
             const id = req.params.id;
     
-            // Log the values to check if they are valid
             console.log('Updating user:', { id, role, status });
     
             // Validate the input
@@ -26,14 +25,24 @@ const methods = {
                 return res.status(400).json({ success: false, message: 'Invalid input data.' });
             }
     
-            await User.updateUser(id, role, status);
-            return res.status(200).json({ success: true, message: 'Successfully updated the user' });
+            const result = await User.updateUser(id, role, status); // Store the result
+            console.log('Update result:', result); // Log the result
     
+            // Check if the update was successful
+            if (result && result[0].affectedRows > 0) {
+                return res.status(200).json({ success: true, message: 'Successfully updated the user' });
+            } else {
+                return res.status(500).json({ success: false, message: 'Failed to update user, please try again.' });
+            }
+            
         } catch (error) {
             console.error('Update error:', error);
-            return res.status(500).json({ success: false, message: 'An error occurred.' });
+            return res.status(500).json({ success: false, message: error.message || 'An error occurred.' });
         }
     },
+    
+    
+
     
     setRole: async (req, res) => {
         try {

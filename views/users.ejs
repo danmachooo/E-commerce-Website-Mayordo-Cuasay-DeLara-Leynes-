@@ -149,13 +149,12 @@
                             body: JSON.stringify({ role, status }),
                         });
 
-                        const result = await response.json();
-                        if (result.success) {
-                            Swal.fire('Updated!', result.message, 'success');
-                            // Reload DataTable after update
-                            $('#usersTable').DataTable().ajax.reload();
+                        const responseData = await response.json(); // Changed variable name to avoid conflict
+                        if (responseData.success) {
+                            Swal.fire('Updated!', responseData.message, 'success');
+                            // Reload the page or the data (consider using a function to refresh the table)
                         } else {
-                            Swal.fire('Error!', result.message, 'error');
+                            Swal.fire('Error!', responseData.message, 'error');
                         }
                     } catch (error) {
                         Swal.fire('Error!', 'An error occurred while updating the user.', 'error');
@@ -163,6 +162,7 @@
                 }
             });
         });
+
     </script>
 </body>
 </html>

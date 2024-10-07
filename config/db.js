@@ -35,7 +35,7 @@ const init_db = async () => {
                 role ENUM('admin', 'customer') DEFAULT 'customer',
                 verification_token VARCHAR(255),
                 token_expiry DATETIME,
-                status ENUM('Active', 'Not Active', 'Blocked'),
+                status ENUM('Active', 'Not Active', 'Blocked') DEFAULT 'Not Active',
                 verified TINYINT(1) DEFAULT 0
             );
         `;

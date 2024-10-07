@@ -31,8 +31,11 @@ const User = {
     updateUser: async (userId, role, status) => {
         const query = 'UPDATE users SET status = ?, role = ? WHERE id = ?';
         console.log('Executing query:', query, [status, role, userId]); // Log the query
-        await pool.query(query, [status, role, userId]);
+        const result = await pool.query(query, [status, role, userId]); // Store the result
+        return result; // Return the result of the query
     },
+    
+    
     
     setStatus: async(userId, status) => {
         await pool.query('UPDATE users SET status = ? WHERE id = ?', [status, userId]);
