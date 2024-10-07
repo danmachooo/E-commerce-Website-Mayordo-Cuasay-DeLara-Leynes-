@@ -75,12 +75,28 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
         });
 
         const result = await response.json();
+        const blockedWords = ['blocked']; // Replace with your blocked words
+        const blockedRegex = new RegExp(blockedWords.join('|'), 'i'); // Create a regex pattern
+
         if (result.success) {
-            window.location.href = '/'; // Redirect to homepage or dashboard
+            if (result.message === 'admin') {
+                window.location.href = '/admin'; // Redirect admin to /admin page
+            } else if (result.message === 'customer') {
+                // Check for blocked words
+                if (blockedRegex.test(result.message)) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Access Denied',
+                        text: 'Your account is blocked.',
+                    });
+                } else {
+                    window.location.href = '/'; // Redirect customer to home page
+                }
+            }
         } else {
             Swal.fire({
                 icon: 'error',
-                title: 'Error',
+                title: 'Login Failed',
                 text: result.message,
             });
         }

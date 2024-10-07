@@ -44,7 +44,7 @@
                       <% cart.forEach(item => { %>
                         <tr id="product-<%= item.productId %>">
                           <td class="product-thumbnail">
-                            <img src="/<%= item.image_path%>" class="img-fluid product-thumbnail" alt="<%= item.name %>" onerror="this.onerror=null; this.src='/path/to/default/image.jpg';">
+                            <img src="uploads/<%= item.image_path%>" class="img-fluid product-thumbnail" alt="<%= item.name %>" onerror="this.onerror=null; this.src='/path/to/default/image.jpg';">
                           </td>
                           <td class="product-name"><h2 class="h5 text-black"><%= item.name %></h2></td>
                           <td class="product-price" id="price-<%= item.productId %>">$<%= item.price %></td>

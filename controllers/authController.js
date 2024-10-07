@@ -3,7 +3,7 @@ const crypto = require('crypto');
 const User = require('../models/user');
 const emailService = require('../services/emailService');
 const { title } = require('process');
-const { query } = require('express');
+const { query } = require('express'); 
 
 const register = async (req, res) => {
     const {email, name, password} = req.body;
@@ -20,6 +20,7 @@ const register = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Email already registered.' });
         }
 
+
         // Hashing the password
         const hashedPassword = await bcrypt.hash(password, 10);
         const verificationToken = crypto.randomBytes(32).toString('hex');
@@ -29,7 +30,9 @@ const register = async (req, res) => {
         await emailService.sendVerificationEmail(email, verificationToken);
 
         // Respond with success
+
         res.status(200).json({ success: true });
+
     } catch (error) {
         console.error('Registration error:', error);
         res.status(500).json({ success: false, message: 'Server error during registration.' });
@@ -56,16 +59,31 @@ const login = async (req, res) => {
         }
 
         req.session.userId = user.id;
+        const role = user.role;
+        console.log('Role: ', role)
+        const status = 'Active';
 
+        if(role === 'admin') {
+            res.status(200).json({ success: true, message: role });
+        } else {
+            if(user.status === 'Blocked'){
+                res.status(200).json({ success: false, message: 'You are blocked by the admin!' });
+            }else {
+                res.status(200).json({ success: true, message: role });
+                await User.setStatus(user.id, status);
+
+            }
+        }
         // Respond with success
-        res.status(200).json({ success: true });
     } catch (error) {
         console.error('Login error:', error);
         res.status(500).json({ success: false, message: 'Server error during login.' });
     }
 };
 
-const logout = (req, res) => {
+const logout = async (req, res) => {
+    const status = 'Not Active';
+    await User.setStatus(req.session.id, status);
     req.session.destroy(err => {
         if (err) {
             console.error('Logout error:', err);

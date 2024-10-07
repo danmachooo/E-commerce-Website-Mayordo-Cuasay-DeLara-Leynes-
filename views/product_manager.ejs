@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Management</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="/admin">Admin Dashboard</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+              <li class="nav-item">
+                <a class="nav-link" href="/admin/user-management">User Management</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/admin/product-management">Product Management</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/admin/order-management">Order Management</a>
+              </li>
+            </ul>
+            <!-- Logout button on the right side of the navbar -->
+            <ul class="navbar-nav ms-auto">
+              <li class="nav-item">
+                <a class="nav-link" href="/logout" onclick="return confirm('Are you sure you want to log out?')">Logout</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+
+    <!-- Product Management Table -->
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Product Management</h1>
+
+        <!-- Create Product Button -->
+        <div class="mb-3 text-end">
+            <a href="/admin/product-management/add-form/" class="btn btn-success">Create Product</a>
+        </div>
+
+        <table id="productsTable" class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Image</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Stock Quantity</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% products.forEach(function(product) { %>
+                    <tr>
+                        <td><%= product.id %></td>
+                        <td><%= product.name %></td>
+                        <td><%= product.description %></td>
+                        <td><img src="/uploads/<%= product.image_path %>" alt="Product Image" width="50"></td>
+                        <td><%= product.category_name %></td> <!-- assuming category_name is available -->
+                        <td>$<%= product.price %></td>
+                        <td><%= product.stock_quantity %></td>
+                        <td>
+                            <!-- Update and Delete buttons -->
+                             <a href="/admin/product-management/update-product/<%=product.id%>">
+                                <button class="btn btn-sm btn-primary btn-update">Update</button>
+                             </a>
+                            <button class="btn btn-sm btn-danger btn-delete" data-id="<%= product.id %>">Delete</button>
+                        </td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Bootstrap JS, DataTables JS, and SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Initialize DataTable
+            $('#productsTable').DataTable({
+                pagingType: "full_numbers",
+                lengthMenu: [5, 10, 25, 50, 100],
+                pageLength: 10,
+                language: {
+                    search: "Filter:",
+                    lengthMenu: "Display _MENU_ entries",
+                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                    paginate: {
+                        first: "First",
+                        last: "Last",
+                        next: "Next",
+                        previous: "Previous"
+                    }
+                }
+            });
+
+            // Handle Delete Button Click
+            $('.btn-delete').click(function() {
+                const productId = $(this).data('id');
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, delete it!',
+                    cancelButtonText: 'No, cancel!',
+                }).then(async (result) => {
+                    if (result.isConfirmed) {
+                        try {
+                            const response = await fetch(`/admin/product-management/delete-product/${productId}`, {
+                                method: 'DELETE',
+                            });
+                            const result = await response.json();
+                            if (result.success) {
+                                Swal.fire('Deleted!', result.message, 'success');
+                                // Reload DataTable after deletion
+                                $('#productsTable').DataTable().row($(this).parents('tr')).remove().draw();
+                            } else {
+                                Swal.fire('Error!', result.message, 'error');
+                            }
+                        } catch (error) {
+                            Swal.fire('Error!', 'An error occurred while deleting the product.', 'error');
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>

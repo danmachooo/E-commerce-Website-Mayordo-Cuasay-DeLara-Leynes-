@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+
+    <!-- SweetAlert CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="/admin">Admin Dashboard</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+              <li class="nav-item">
+                <a class="nav-link" href="/admin/user-management">User Management</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/admin/product-management">Product Management</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/admin/order-management">Order Management</a>
+              </li>
+
+            </ul>
+      
+            <!-- Logout button on the right side of the navbar -->
+            <ul class="navbar-nav ms-auto">
+              <li class="nav-item">
+                <a class="nav-link" href="/logout" onclick="return confirm('Are you sure you want to log out?')">Logout</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+      
+  </nav>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">User Management</h1>
+
+        <table id="usersTable" class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Verified</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% users.forEach(function(user) { %>
+                    <tr>
+                        <td><%= user.name %></td>
+                        <td><%= user.email %></td>
+                        <td>
+                            <select class="form-select" id="role-<%= user.id %>" name="role">
+                                <option value="admin" <%= user.role === 'admin' ? 'selected' : '' %>>Admin</option>
+                                <option value="customer" <%= user.role === 'customer' ? 'selected' : '' %>>Customer</option>
+                            </select>
+                        </td>
+                        <td>
+                            <select class="form-select" id="status-<%= user.id %>" name="status">
+                                <option value="Active" <%= user.status === 'Active' ? 'selected' : '' %>>Active</option>
+                                <option value="Not Active" <%= user.status === 'Not Active' ? 'selected' : '' %>>Not Active</option>
+                                <option value="Blocked" <%= user.status === 'Blocked' ? 'selected' : '' %>>Blocked</option>
+                            </select>
+                        </td>
+                        <td>
+                            <% if (user.verified === 1) { %>
+                                <span class="badge bg-success">Verified</span>
+                            <% } else { %>
+                                <span class="badge bg-warning">Not Verified</span>
+                            <% } %>
+                        </td>
+                        <td>
+                            <!-- Update button with data-id attribute -->
+                            <button class="btn btn-sm btn-primary btn-update" data-id="<%= user.id %>">Update</button>
+                        </td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Bootstrap JS, DataTables JS, and SweetAlert JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Initialize DataTable
+            $('#usersTable').DataTable({
+                // Pagination settings
+                pagingType: "full_numbers",
+                lengthMenu: [5, 10, 25, 50, 100],
+                pageLength: 10, // Default number of entries shown
+                language: {
+                    search: "Filter:",
+                    lengthMenu: "Display _MENU_ entries",
+                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                    paginate: {
+                        first: "First",
+                        last: "Last",
+                        next: "Next",
+                        previous: "Previous"
+                    }
+                }
+            });
+        });
+
+        $(document).on('click', '.btn-update', function() {
+            const userId = $(this).data('id'); // Get user ID from button's data attribute
+            const role = $(`#role-${userId}`).val(); // Get new role value from dropdown
+            const status = $(`#status-${userId}`).val(); // Get new status value from dropdown
+
+            // Confirmation dialog
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Do you want to update the user information?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, update it!',
+                cancelButtonText: 'No, cancel!'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const response = await fetch(`/admin/user-management/update-user/${userId}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ role, status }),
+                        });
+
+                        const responseData = await response.json(); // Changed variable name to avoid conflict
+                        if (responseData.success) {
+                            Swal.fire('Updated!', responseData.message, 'success');
+                            // Reload the page or the data (consider using a function to refresh the table)
+                        } else {
+                            Swal.fire('Error!', responseData.message, 'error');
+                        }
+                    } catch (error) {
+                        Swal.fire('Error!', 'An error occurred while updating the user.', 'error');
+                    }
+                }
+            });
+        });
+
+    </script>
+</body>
+</html>

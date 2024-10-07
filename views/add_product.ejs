@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Product</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .form-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        #imagePreview {
+            margin-top: 10px;
+            max-width: 200px;
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="form-container">
+                    <h1 class="mb-4 text-center">Add New Product</h1>
+                    <form id="productForm" action="/admin/product-management/add-form/add-product" method="POST" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label for="name">Product Name:</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="description">Description:</label>
+                            <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="price">Price:</label>
+                            <input type="number" class="form-control" id="price" name="price" required step="0.01" min="0">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="stock_quantity">Stock Quantity:</label>
+                            <input type="number" class="form-control" id="stock_quantity" name="stock_quantity" required min="0">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="category_id">Category:</label>
+                            <select class="form-control" id="category_id" name="category_id">
+                                <option value="" disabled selected>Select category</option> <!-- Default option -->
+                                <% categories.forEach(category => { %>
+                                    <option value="<%= category.id %>"><%= category.name %></option>
+                                <% }) %>
+                            </select>
+                            <button type="button" class="btn btn-secondary mt-2" id="addCategoryBtn">Add New Category</button>
+                        </div>
+                        
+                        <div id="newCategoryDiv" style="display:none;">
+                            <div class="form-group">
+                                <label for="new_category">New Category:</label>
+                                <input type="text" class="form-control" id="new_category" name="new_category">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="image">Upload Image:</label>
+                            <input type="file" class="form-control-file" id="image" name="image" accept="image/*"><br>
+                            <img id="imagePreview" style="display:none;" />
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-block">Add Product</button>
+                        <a href="/admin/product-management/" class="btn btn-secondary btn-block">Go Back</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+
+    <script>
+        // Show new category input field
+        document.getElementById('addCategoryBtn').onclick = function() {
+            const newCategoryDiv = document.getElementById('newCategoryDiv');
+            newCategoryDiv.style.display = newCategoryDiv.style.display === 'none' ? 'block' : 'none';
+        };
+
+        // Preview image before uploading
+        document.getElementById('image').onchange = function(e) {
+            const imagePreview = document.getElementById('imagePreview');
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                imagePreview.src = event.target.result;
+                imagePreview.style.display = 'block';
+            };
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+        };
+
+        document.getElementById('productForm').onsubmit = function(event) {
+            event.preventDefault(); // Prevent default form submission
+        
+            const formData = new FormData();
+            const name = document.getElementById('name').value;
+            const description = document.getElementById('description').value;
+            const price = document.getElementById('price').value; 
+            const stock_quantity = document.getElementById('stock_quantity').value;
+            const image = document.getElementById('image').files[0];
+            
+            // Append basic fields to formData
+            formData.append('name', name);
+            formData.append('description', description);
+            formData.append('price', price);
+            formData.append('stock_quantity', stock_quantity);
+        
+            // Check if new category is provided
+            const newCategory = document.getElementById('new_category').value.trim();
+            const selectedCategoryId = document.getElementById('category_id').value;
+        
+            if (newCategory) {
+                formData.append('new_category', newCategory); // Append new category
+            } else if (selectedCategoryId) {
+                formData.append('category_id', selectedCategoryId); // Add selected category id if exists
+            } else {
+                // If both new category and selected category are not provided, show an error
+                swal("Error!", "You must select or enter a category.", "error");
+                return; // Prevent form submission
+            }
+        
+            if (image) {
+                formData.append('image', image); // Append image if provided
+            }
+        
+            // Log the formData values for debugging
+            for (let pair of formData.entries()) {
+                console.log(`${pair[0]}: ${pair[1]}`);
+            }
+        
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => {
+                if (response.ok) {
+                    swal({
+                        title: "Success!",
+                        text: "Product added successfully!",
+                        icon: "success",
+                        button: "OK",
+                    }).then(() => {
+                        window.location.reload(); // Reload the page after alert
+                    });
+                } else {
+                    return response.json().then(data => {
+                        swal("Error!", data.message || "Error adding product.", "error");
+                    });
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                swal("Error!", "An error occurred while adding the product.", "error");
+            });
+        };
+        
+    </script>
+</body>
+</html>

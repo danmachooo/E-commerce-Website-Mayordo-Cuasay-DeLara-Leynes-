@@ -7,7 +7,6 @@ const OrderItem = {
             [orderId, productId, quantity]
         );
     },
-
     findByOrderId: async (orderId) => {
         const [rows] = await pool.query(
             `SELECT oi.*, p.name, p.price 
