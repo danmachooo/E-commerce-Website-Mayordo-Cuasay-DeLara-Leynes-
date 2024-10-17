@@ -1,4 +1,5 @@
 const mysql = require('mysql2/promise');
+const bcrypt = require('bcrypt'); // Import bcrypt
 
 const dbConfig = {
     host: 'localhost',
@@ -6,7 +7,7 @@ const dbConfig = {
     password: ''
 };
 
-const dbName = 'MCDLEcommerce';
+const dbName = 'HelloWorld_Ecommerce';
 const pool = mysql.createPool(dbConfig);
 
 const init_db = async () => {
@@ -81,8 +82,8 @@ const init_db = async () => {
                 FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
             );
         `;
-    
 
+        // Create tables
         await connection.query(createUsersTableQuery);
         await connection.query(createCategoriesTableQuery);
         await connection.query(createProductsTableQuery);
@@ -90,6 +91,43 @@ const init_db = async () => {
         await connection.query(createOrderItemsTableQuery);
 
         console.log('All tables are ready!');
+
+        // Check if there are any users in the users table
+        const [users] = await connection.query('SELECT COUNT(*) AS count FROM users');
+
+        if (users[0].count === 0) {
+            // Insert an admin user if there are no users
+            const adminUser = {
+                name: 'Admin',
+                email: 'johnpauldanmachi@gmail.com',
+                password: 'admin', // This will be hashed
+                role: 'admin',
+                status: 'Active',
+                verified: 1 
+            };
+
+            // Hash the password
+            const saltRounds = 10; // Number of salt rounds for hashing
+            adminUser.hashedPassword = await bcrypt.hash(adminUser.password, saltRounds); // Hash the password
+
+            const insertAdminQuery = `
+                INSERT INTO users (name, email, password, role, status, verified)
+                VALUES (?, ?, ?, ?, ?, ?)
+            `;
+
+            await connection.query(insertAdminQuery, [
+                adminUser.name,
+                adminUser.email,
+                adminUser.hashedPassword, // Use the hashed password here
+                adminUser.role,
+                adminUser.status,
+                adminUser.verified
+            ]);
+
+            console.log('Admin user has been inserted!');
+        } else {
+            console.log('Admin user already exists. Skipping insertion.');
+        }
 
         await connection.release(); // release the connection back to the pool
     } 

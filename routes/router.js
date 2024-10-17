@@ -38,12 +38,12 @@ router.get('/admin', authMiddleware, async (req, res) => {
           GROUP BY month
         `);
     
-        // Prepare data for the chart
-        const monthlySales = new Array(12).fill(0); // Assuming sales for each month
+        const monthlySales = new Array(12).fill(0); // Initialize the array with zeros
         salesData.forEach(sale => {
-          monthlySales[sale.month - 1] = sale.total; // month - 1 because array is 0-indexed
+          monthlySales[sale.month - 1] = parseFloat(sale.total) || 0; // Ensure total is a number
         });
-    
+
+        console.log(monthlySales);
         res.render('adminForm', {
           totalUsers: users[0].total,
           totalProducts: products[0].total,
@@ -60,18 +60,18 @@ router.get('/admin/user-management', authMiddleware, UserController.displayAllUs
 router.post('/admin/user-management/update-user/:id', UserController.updateUser);
 
 // Product Management (Admin)
-router.get('/admin/product-management', ProductController.displayAllInAdmin);
-router.get('/admin/product-management/add-form', ProductController.renderCreate);
-router.post('/admin/product-management/add-form/add-product', upload.single('image'), ProductController.create);
-router.get('/admin/product-management/update-product/:id', ProductController.renderUpdate);
-router.post('/admin/product-management/update-product/:id', upload.single('image'), ProductController.update);
-router.delete('/admin/product-management/delete-product/:id', ProductController.delete);
+router.get('/admin/product-management',authMiddleware, ProductController.displayAllInAdmin);
+router.get('/admin/product-management/add-form',authMiddleware, ProductController.renderCreate);
+router.post('/admin/product-management/add-form/add-product',authMiddleware, upload.single('image'), ProductController.create);
+router.get('/admin/product-management/update-product/:id',authMiddleware, ProductController.renderUpdate);
+router.post('/admin/product-management/update-product/:id',authMiddleware, upload.single('image'), ProductController.update);
+router.delete('/admin/product-management/delete-product/:id',authMiddleware, ProductController.delete);
 
 // Order Management (Admin)
-router.get('/admin/order-management', OrderController.getAll); // View all orders
-router.post('/admin/order-management/update-status/:id', OrderController.updateStatus); // Update order status
-router.delete('/admin/order-management/delete-order/:id', OrderController.delete); // Update order status
-router.get('/admin/order-management/:id', OrderController.getById); // Get a specific order by ID
+router.get('/admin/order-management',authMiddleware, OrderController.getAll); // View all orders
+router.post('/admin/order-management/update-status/:id',authMiddleware, OrderController.updateStatus); // Update order status
+router.delete('/admin/order-management/delete-order/:id',authMiddleware, OrderController.delete); // Update order status
+router.get('/admin/order-management/:id',authMiddleware, OrderController.getById); // Get a specific order by ID
 
 // User Routes
 router.get('/order-history', OrderController.getByUserId); // Get orders for the logged-in user
@@ -91,15 +91,15 @@ router.get('/order-items/:orderId', OrderItemController.getByOrderId);
 router.delete('/order-items/:id', OrderItemController.delete);
 
 // Cart routes
-router.post('/cart/add', CartController.addItem);
-router.get('/cart', CartController.viewCart);
-router.put('/cart/update/:productId', CartController.updateItem);
-router.delete('/cart/remove/:productId', CartController.removeItem);
-router.delete('/cart/clear', CartController.clearCart);
+router.post('/cart/add',authMiddleware, CartController.addItem);
+router.get('/cart',authMiddleware, CartController.viewCart);
+router.put('/cart/update/:productId',authMiddleware, CartController.updateItem);
+router.delete('/cart/remove/:productId',authMiddleware, CartController.removeItem);
+router.delete('/cart/clear',authMiddleware, CartController.clearCart);
 
 // Checkout routes
-router.post('/checkout', CheckoutController.checkout);
-router.get('/checkout-page', CheckoutController.renderCheckout);
+router.post('/checkout', authMiddleware, CheckoutController.checkout);
+router.get('/checkout-page', authMiddleware, CheckoutController.renderCheckout);
 
 // Thank you page after successful checkout
 router.get('/thankyou', (req, res) => {
